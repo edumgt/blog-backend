@@ -4,7 +4,8 @@ export const getAll = async (_, res) => {
   try {
     const posts = await PostModel.find()
       .populate({ path: 'user', select: ['fullName', 'avatarUrl'] })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .exec();
     res.json(posts);
   } catch (err) {
     console.log(err);
@@ -28,7 +29,9 @@ export const getOne = async (req, res) => {
       {
         returnDocument: 'after',
       },
-    ).populate({ path: 'user', select: ['fullName', 'avatarUrl'] });
+    )
+      .populate({ path: 'user', select: ['fullName', 'avatarUrl'] })
+      .exec();
     if (!doc) {
       return res.status(404).json({
         message: 'Post not found',
