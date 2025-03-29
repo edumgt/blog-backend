@@ -1,11 +1,10 @@
 import PostModel from '../models/Post.js';
 
-export const getAll = async (req, res) => {
+export const getAll = async (_, res) => {
   try {
     const posts = await PostModel.find()
       .populate({ path: 'user', select: ['fullName', 'avatarUrl'] })
-      .sort({ createdAt: -1 })
-      .exec();
+      .sort({ createdAt: -1 });
     res.json(posts);
   } catch (err) {
     console.log(err);
@@ -87,7 +86,40 @@ export const remove = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: 'Error deletion post',
+      message: 'Error deleting post',
+    });
+  }
+};
+
+export const update = async (req, res) => {
+  try {
+    const postId = req.params.id;
+
+    const doc = await PostModel.findById(postId);
+    if (!doc) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    if (doc.user.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const updatedPost = await PostModel.findOneAndUpdate(
+      { _id: postId },
+      {
+        title: req.body.title,
+        text: req.body.text,
+        tags: req.body.tags,
+        imageUrl: req.body.imageUrl,
+      },
+      { returnDocument: 'after' },
+    );
+
+    res.json(updatedPost);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Error updating post',
     });
   }
 };
