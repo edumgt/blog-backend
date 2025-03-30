@@ -8,10 +8,8 @@ import uploadRoutes from './routes/uploadRoutes.js';
 
 dotenv.config();
 
-const MONGO_URI = process.env.MONGO_URI;
-
 mongoose
-  .connect(MONGO_URI)
+  .connect(process.env.MONGO_URI)
   .then(() => console.log('DB OK'))
   .catch((err) => console.log('DB error', err));
 
@@ -24,9 +22,11 @@ app.use('/auth', authRoutes);
 app.use('/posts', postRoutes);
 app.use(uploadRoutes);
 
-app.listen(3000, (err) => {
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, (err) => {
   if (err) {
     return console.log(err);
   }
-  console.log('Server OK');
+  console.log(`Server running on port ${PORT}`);
 });
