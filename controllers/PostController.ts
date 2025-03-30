@@ -1,6 +1,9 @@
-import PostModel from '../models/Post.js';
+import { Request, Response } from 'express';
 
-export const getAll = async (_, res) => {
+import PostModel from '../models/Post.js';
+import { AuthRequest } from '../types.js';
+
+export const getAll = async (_: Request, res: Response) => {
   try {
     const posts = await PostModel.find()
       .populate({ path: 'user', select: ['fullName', 'avatarUrl'] })
@@ -15,7 +18,7 @@ export const getAll = async (_, res) => {
   }
 };
 
-export const getOne = async (req, res) => {
+export const getOne = async (req: Request, res: Response) => {
   try {
     const postId = req.params.id;
 
@@ -33,9 +36,10 @@ export const getOne = async (req, res) => {
       .populate({ path: 'user', select: ['fullName', 'avatarUrl'] })
       .exec();
     if (!doc) {
-      return res.status(404).json({
+      res.status(404).json({
         message: 'Post not found',
       });
+      return;
     }
     res.json(doc);
   } catch (err) {
@@ -46,7 +50,7 @@ export const getOne = async (req, res) => {
   }
 };
 
-export const create = async (req, res) => {
+export const create = async (req: AuthRequest, res: Response) => {
   try {
     const doc = new PostModel({
       title: req.body.title,
@@ -67,18 +71,20 @@ export const create = async (req, res) => {
   }
 };
 
-export const remove = async (req, res) => {
+export const remove = async (req: AuthRequest, res: Response) => {
   try {
     const postId = req.params.id;
 
     const doc = await PostModel.findById(postId);
 
     if (!doc) {
-      return res.status(404).json({ message: 'Post not found' });
+      res.status(404).json({ message: 'Post not found' });
+      return;
     }
 
     if (doc.user.toString() !== req.userId) {
-      return res.status(403).json({ message: 'Access denied' });
+      res.status(403).json({ message: 'Access denied' });
+      return;
     }
 
     await PostModel.deleteOne({ _id: postId });
@@ -94,17 +100,19 @@ export const remove = async (req, res) => {
   }
 };
 
-export const update = async (req, res) => {
+export const update = async (req: AuthRequest, res: Response) => {
   try {
     const postId = req.params.id;
 
     const doc = await PostModel.findById(postId);
     if (!doc) {
-      return res.status(404).json({ message: 'Post not found' });
+      res.status(404).json({ message: 'Post not found' });
+      return;
     }
 
     if (doc.user.toString() !== req.userId) {
-      return res.status(403).json({ message: 'Access denied' });
+      res.status(403).json({ message: 'Access denied' });
+      return;
     }
 
     const updatedPost = await PostModel.findOneAndUpdate(

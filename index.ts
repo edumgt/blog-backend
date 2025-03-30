@@ -9,7 +9,7 @@ import uploadRoutes from './routes/uploadRoutes.js';
 dotenv.config();
 
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI || '')
   .then(() => console.log('DB OK'))
   .catch((err) => console.log('DB error', err));
 

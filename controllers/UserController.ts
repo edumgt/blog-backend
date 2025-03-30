@@ -1,9 +1,11 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import { Response } from 'express';
 
 import UserModel from '../models/User.js';
+import { AuthRequest } from '../types.js';
 
-export const register = async (req, res) => {
+export const register = async (req: AuthRequest, res: Response) => {
   try {
     const password = req.body.password;
     const salt = await bcrypt.genSalt(10);
@@ -22,13 +24,13 @@ export const register = async (req, res) => {
       {
         _id: user._id,
       },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || '',
       {
         expiresIn: '30d',
       },
     );
 
-    const { passwordHash, ...userData } = user._doc;
+    const { passwordHash, ...userData } = user.toObject();
 
     res.json({
       ...userData,
@@ -42,34 +44,36 @@ export const register = async (req, res) => {
   }
 };
 
-export const login = async (req, res) => {
+export const login = async (req: AuthRequest, res: Response) => {
   try {
     const user = await UserModel.findOne({ email: req.body.email });
 
     if (!user) {
-      return res.status(404).json({
+      res.status(404).json({
         message: 'Incorrect login or password',
       });
+      return;
     }
 
-    const isValidPassword = await bcrypt.compare(req.body.password, user._doc.passwordHash);
+    const isValidPassword = await bcrypt.compare(req.body.password, user.toObject().passwordHash);
 
     if (!isValidPassword) {
-      return res.status(400).json({
+      res.status(400).json({
         message: 'Incorrect login or password',
       });
+      return;
     }
 
     const token = jwt.sign(
       {
         _id: user._id,
       },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || '',
       {
         expiresIn: '30d',
       },
     );
-    const { passwordHash, ...userData } = user._doc;
+    const { passwordHash, ...userData } = user.toObject();
 
     res.json({
       ...userData,
@@ -83,16 +87,17 @@ export const login = async (req, res) => {
   }
 };
 
-export const getMe = async (req, res) => {
+export const getMe = async (req: AuthRequest, res: Response) => {
   try {
     const user = await UserModel.findById(req.userId);
     if (!user) {
-      return res.status(404).json({
+      res.status(404).json({
         message: 'User not found',
       });
+      return;
     }
 
-    const { passwordHash, ...userData } = user._doc;
+    const { passwordHash, ...userData } = user.toObject();
 
     res.json(userData);
   } catch (err) {

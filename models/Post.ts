@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 
-const PostSchema = new mongoose.Schema(
+import { IPost } from '../types.js';
+
+const PostSchema = new mongoose.Schema<IPost>(
   {
     title: {
       type: String,
@@ -30,4 +32,4 @@ const PostSchema = new mongoose.Schema(
   },
 );
 
-export default mongoose.model('Post', PostSchema);
+export default mongoose.model<IPost>('Post', PostSchema);

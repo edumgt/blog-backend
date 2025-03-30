@@ -1,6 +1,8 @@
 import express from 'express';
-import multer from 'multer';
+import multer, { MulterError } from 'multer';
 import fs from 'fs';
+import { Request, Response, NextFunction } from 'express';
+
 import { checkAuth } from '../middlewares/index.js';
 
 const uploadDir = './uploads';
@@ -23,7 +25,7 @@ const upload = multer({
   fileFilter: (_, file, callback) => {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
     if (!allowedTypes.includes(file.mimetype)) {
-      return callback(new Error('Only image files are allowed'), false);
+      return callback(null, false);
     }
     callback(null, true);
   },
@@ -35,16 +37,22 @@ router.post(
   '/upload',
   checkAuth,
   upload.single('image'),
-  (req, res) => {
+  (req: Request, res: Response) => {
+    if (!req.file) {
+      res.status(400).json({ message: 'No file uploaded' });
+      return;
+    }
     res.json({
       url: `/uploads/${req.file.originalname}`,
     });
   },
-  (err, req, res, next) => {
+  (err: MulterError | Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof multer.MulterError) {
-      return res.status(400).json({ message: err.message });
+      res.status(400).json({ message: err.message });
+      return;
     } else if (err) {
-      return res.status(500).json({ message: 'Server error' });
+      res.status(500).json({ message: 'Server error' });
+      return;
     }
   },
 );
