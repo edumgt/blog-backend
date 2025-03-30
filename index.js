@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import multer from 'multer';
 
-import checkAuth from './utils/checkAuth.js';
+import { validateRequest, checkAuth } from './utils/index.js';
 import { registerValidation, loginValidation, postCreateValidation } from './validations.js';
 import { UserController, PostController } from './controllers/index.js';
 
@@ -32,8 +32,8 @@ const upload = multer({ storage });
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
-app.post('/auth/login', loginValidation, UserController.login);
-app.post('/auth/register', registerValidation, UserController.register);
+app.post('/auth/login', loginValidation, validateRequest, UserController.login);
+app.post('/auth/register', registerValidation, validateRequest, UserController.register);
 app.get('/auth/me', checkAuth, UserController.getMe);
 
 app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
@@ -44,9 +44,9 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
 
 app.get('/posts', PostController.getAll);
 app.get('/posts/:id', PostController.getOne);
-app.post('/posts', checkAuth, postCreateValidation, PostController.create);
+app.post('/posts', checkAuth, postCreateValidation, validateRequest, PostController.create);
 app.delete('/posts/:id', checkAuth, PostController.remove);
-app.patch('/posts/:id', checkAuth, PostController.update);
+app.patch('/posts/:id', checkAuth, postCreateValidation, validateRequest, PostController.update);
 
 app.listen(3000, (err) => {
   if (err) {

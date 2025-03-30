@@ -13,8 +13,8 @@ export const loginValidation = [
 ];
 
 export const postCreateValidation = [
-  body('title', 'Enter post title').isLength({ min: 3 }).isString(),
-  body('text', 'Enter post text').isLength({ min: 5 }).isString(),
+  body('title', 'Post title must be at least 3 characters').isLength({ min: 3 }).isString(),
+  body('text', 'Post text must be at least 5 characters').isLength({ min: 5 }).isString(),
   body('tags', 'Invalid tag format').optional().isString(),
   body('imageUrl', 'Invalid image URL').optional().isString(),
 ];
