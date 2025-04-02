@@ -24,7 +24,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/auth', authRoutes);
 app.use('/posts', postRoutes);
 app.use(uploadRoutes);
-app.use('/tags', tagsRoutes);
+app.use(tagsRoutes);
 
 const PORT = process.env.PORT || 3000;
 
