@@ -6,6 +6,7 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import tagsRoutes from './routes/tagsRoutes.js';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/auth', authRoutes);
 app.use('/posts', postRoutes);
 app.use(uploadRoutes);
+app.use('/tags', tagsRoutes);
 
 const PORT = process.env.PORT || 3000;
 
