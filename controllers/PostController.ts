@@ -2,12 +2,24 @@ import { Request, Response } from 'express';
 
 import PostModel from '../models/Post.js';
 import { AuthRequest } from '../types.js';
+import { SortOrder } from 'mongoose';
 
-export const getAll = async (_: Request, res: Response) => {
+export const getAll = async (req: Request, res: Response) => {
   try {
-    const posts = await PostModel.find()
+    const sortParam = req.query.sort;
+    const tagFilter = req.query.tag;
+
+    const sortBy: { [key: string]: SortOrder } =
+      sortParam === 'popular' ? { viewsCount: -1 } : { createdAt: -1 };
+
+    const query: any = {};
+    if (tagFilter) {
+      query.tags = tagFilter;
+    }
+
+    const posts = await PostModel.find(query)
       .populate({ path: 'user', select: ['fullName', 'avatarUrl'] })
-      .sort({ createdAt: -1 })
+      .sort(sortBy)
       .exec();
     res.status(200).json(posts);
   } catch (err) {
