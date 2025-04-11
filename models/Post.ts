@@ -1,8 +1,8 @@
-import mongoose from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 
 import { IPost } from '../types.js';
 
-const PostSchema = new mongoose.Schema<IPost>(
+const PostSchema = new Schema<IPost>(
   {
     title: {
       type: String,
@@ -13,15 +13,19 @@ const PostSchema = new mongoose.Schema<IPost>(
       required: true,
     },
     tags: {
-      type: Array,
+      type: [String],
       default: [],
     },
     viewsCount: {
       type: Number,
       default: 0,
     },
+    commentsCount: {
+      type: Number,
+      default: 0,
+    },
     user: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: 'User',
       required: true,
     },
@@ -32,4 +36,4 @@ const PostSchema = new mongoose.Schema<IPost>(
   },
 );
 
-export default mongoose.model<IPost>('Post', PostSchema);
+export default model<IPost>('Post', PostSchema);

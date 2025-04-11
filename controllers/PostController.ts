@@ -9,7 +9,7 @@ export const getAll = async (_: Request, res: Response) => {
       .populate({ path: 'user', select: ['fullName', 'avatarUrl'] })
       .sort({ createdAt: -1 })
       .exec();
-    res.json(posts);
+    res.status(200).json(posts);
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -41,7 +41,7 @@ export const getOne = async (req: Request, res: Response) => {
       });
       return;
     }
-    res.json(doc);
+    res.status(200).json(doc);
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -62,7 +62,7 @@ export const create = async (req: AuthRequest, res: Response) => {
 
     const post = await doc.save();
 
-    res.json(post);
+    res.status(201).json(post);
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -89,7 +89,7 @@ export const remove = async (req: AuthRequest, res: Response) => {
 
     await PostModel.deleteOne({ _id: postId });
 
-    res.json({
+    res.status(200).json({
       success: true,
     });
   } catch (err) {
@@ -126,7 +126,7 @@ export const update = async (req: AuthRequest, res: Response) => {
       { returnDocument: 'after' },
     );
 
-    res.json(updatedPost);
+    res.status(200).json(updatedPost);
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -143,7 +143,7 @@ export const getLastTags = async (_: Request, res: Response) => {
       .map((obj) => obj.tags)
       .flat()
       .slice(0, 5);
-    res.json(tags);
+    res.status(200).json(tags);
   } catch (err) {
     console.log(err);
     res.status(500).json({

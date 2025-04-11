@@ -32,7 +32,7 @@ export const register = async (req: AuthRequest, res: Response) => {
 
     const { passwordHash, ...userData } = user.toObject();
 
-    res.json({
+    res.status(201).json({
       ...userData,
       token,
     });
@@ -75,7 +75,7 @@ export const login = async (req: AuthRequest, res: Response) => {
     );
     const { passwordHash, ...userData } = user.toObject();
 
-    res.json({
+    res.status(200).json({
       ...userData,
       token,
     });
@@ -99,7 +99,7 @@ export const getMe = async (req: AuthRequest, res: Response) => {
 
     const { passwordHash, ...userData } = user.toObject();
 
-    res.json(userData);
+    res.status(200).json(userData);
   } catch (err) {
     console.log(err);
     res.status(500).json({
