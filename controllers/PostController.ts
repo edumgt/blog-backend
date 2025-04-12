@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-
-import PostModel from '../models/Post.js';
-import { AuthRequest } from '../types.js';
 import { SortOrder } from 'mongoose';
 
-export const getAll = async (req: Request, res: Response) => {
+import PostModel from '../models/Post.js';
+import { AuthRequest, GetAllQuery } from '../types.js';
+
+export const getAll = async (req: Request<{}, {}, {}, GetAllQuery>, res: Response) => {
   try {
     const sortParam = req.query.sort;
     const tagFilter = req.query.tag;
@@ -12,7 +12,7 @@ export const getAll = async (req: Request, res: Response) => {
     const sortBy: { [key: string]: SortOrder } =
       sortParam === 'popular' ? { viewsCount: -1 } : { createdAt: -1 };
 
-    const query: any = {};
+    const query: Record<string, any> = {};
     if (tagFilter) {
       query.tags = tagFilter;
     }

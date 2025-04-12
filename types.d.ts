@@ -33,3 +33,8 @@ export interface IComment extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface GetAllQuery {
+  sort?: 'popular';
+  tag?: string;
+}
