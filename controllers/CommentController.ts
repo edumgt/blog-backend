@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 
-import CommentModel from '../models/Comment.js';
-import PostModel from '../models/Post.js';
-import { AuthRequest } from '../types.js';
+import CommentModel from '../models/Comment';
+import PostModel from '../models/Post';
+import { AuthRequest } from '../types';
 
 export const getPostComments = async (req: Request, res: Response) => {
   try {

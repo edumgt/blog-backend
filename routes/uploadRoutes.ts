@@ -3,7 +3,7 @@ import multer, { MulterError } from 'multer';
 import fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 
-import { checkAuth } from '../middlewares/index.js';
+import { checkAuth } from '../middlewares/index';
 
 const uploadDir = './uploads';
 if (!fs.existsSync(uploadDir)) {

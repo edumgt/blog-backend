@@ -1,2 +1,2 @@
-export { default as checkAuth } from './checkAuth.js';
-export { default as validateRequest } from './validateRequest.js';
+export { default as checkAuth } from './checkAuth';
+export { default as validateRequest } from './validateRequest';

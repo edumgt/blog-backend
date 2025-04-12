@@ -1,6 +1,6 @@
 import { Schema, Types, model } from 'mongoose';
 
-import { IPost } from '../types.js';
+import { IPost } from '../types';
 
 const PostSchema = new Schema<IPost>(
   {

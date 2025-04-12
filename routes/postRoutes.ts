@@ -1,8 +1,8 @@
 import express from 'express';
 
-import { CommentController, PostController } from '../controllers/index.js';
-import { validateRequest, checkAuth } from '../middlewares/index.js';
-import { commentCreateValidation, postCreateValidation } from '../validations.js';
+import { CommentController, PostController } from '../controllers/index';
+import { validateRequest, checkAuth } from '../middlewares/index';
+import { commentCreateValidation, postCreateValidation } from '../validations';
 
 const router = express.Router();
 

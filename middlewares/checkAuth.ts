@@ -1,7 +1,7 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { NextFunction, Response } from 'express';
 
-import { AuthRequest } from '../types.js';
+import { AuthRequest } from '../types';
 
 export default (req: AuthRequest, res: Response, next: NextFunction): void => {
   const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');

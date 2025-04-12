@@ -3,11 +3,11 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
-import authRoutes from './routes/authRoutes.js';
-import postRoutes from './routes/postRoutes.js';
-import uploadRoutes from './routes/uploadRoutes.js';
-import tagsRoutes from './routes/tagsRoutes.js';
-import commentRoutes from './routes/commentRoutes.js';
+import authRoutes from './routes/authRoutes';
+import postRoutes from './routes/postRoutes';
+import uploadRoutes from './routes/uploadRoutes';
+import tagsRoutes from './routes/tagsRoutes';
+import commentRoutes from './routes/commentRoutes';
 
 dotenv.config();
 

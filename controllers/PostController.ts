@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { SortOrder } from 'mongoose';
 
-import PostModel from '../models/Post.js';
-import { AuthRequest, GetAllQuery } from '../types.js';
+import PostModel from '../models/Post';
+import { AuthRequest, GetAllQuery } from '../types';
 
 export const getAll = async (req: Request<{}, {}, {}, GetAllQuery>, res: Response) => {
   try {
