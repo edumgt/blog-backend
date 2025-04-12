@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "nodemon --watch *.ts --exec npx tsx index.ts",
     "start": "node dist/index.js",
-    "build": "tsc"
+    "build": "tsc",
+    "predeploy": "npm install && npm run build",
+    "deploy": "npm start"
   },
   "author": "",
   "license": "ISC",
