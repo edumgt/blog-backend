@@ -1,35 +1,25 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import multer, { MulterError } from 'multer';
-import fs from 'fs';
-import { Request, Response, NextFunction } from 'express';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
 import { checkAuth } from '../middlewares/index';
-
-const uploadDir = './uploads';
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
-
-const storage = multer.diskStorage({
-  destination: (_, __, callback) => {
-    callback(null, uploadDir);
-  },
-  filename: (_, file, callback) => {
-    callback(null, file.originalname);
-  },
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: (_, file, callback) => {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-    if (!allowedTypes.includes(file.mimetype)) {
-      return callback(null, false);
-    }
-    callback(null, true);
-  },
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: async (_, file) => ({
+    folder: 'your-app-images',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
+    public_id: file.originalname.split('.')[0],
+  }),
 });
+
+const upload = multer({ storage });
 
 const router = express.Router();
 
@@ -38,21 +28,22 @@ router.post(
   checkAuth,
   upload.single('image'),
   (req: Request, res: Response) => {
-    if (!req.file) {
+    if (!req.file || !('path' in req.file)) {
       res.status(400).json({ message: 'No file uploaded' });
       return;
     }
+
+    const file = req.file as Express.Multer.File & { path: string };
+
     res.json({
-      url: `/uploads/${req.file.originalname}`,
+      url: file.path,
     });
   },
-  (err: MulterError | Error, req: Request, res: Response, next: NextFunction) => {
+  (err: MulterError | Error, _: Request, res: Response, __: NextFunction) => {
     if (err instanceof multer.MulterError) {
       res.status(400).json({ message: err.message });
-      return;
     } else if (err) {
       res.status(500).json({ message: 'Server error' });
-      return;
     }
   },
 );
