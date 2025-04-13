@@ -2,7 +2,7 @@
 
 REST API для блога на Express и TS.
 
-[Фронтенд для этого API](https://blogaboutit.netlify.app/)
+[Frontend для этого API](https://blogaboutit.netlify.app/)
 
 ## Technologies Used
 
@@ -14,6 +14,7 @@ REST API для блога на Express и TS.
 - Multer + Cloudinary - загрузка изображений
 - CORS, dotenv - настройка окружения
 - express-validator — валидация входящих данных
+- Render - деплой
 
 ## Features
 
@@ -40,8 +41,8 @@ REST API для блога на Express и TS.
 | GET    | /tags               | Получение тегов                 | Нет           |
 | GET    | /posts/:id/comments | Получение комментариев к посту  | Нет           |
 | POST   | /posts/:id/comments | Добавление комментария к посту  | Да            |
-| PATCH  | comments/:id        | Обновление комментария          | Да            |
-| DELETE | comments/:id        | Удаление комментария            | Да            |
+| PATCH  | /comments/:id       | Обновление комментария          | Да            |
+| DELETE | /comments/:id       | Удаление комментария            | Да            |
 
 ## How to start project
 
