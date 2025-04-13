@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get('/', PostController.getAll);
 router.get('/:id', PostController.getOne);
-router.post('/create', checkAuth, postCreateValidation, validateRequest, PostController.create);
+router.post('/', checkAuth, postCreateValidation, validateRequest, PostController.create);
 router.patch('/:id', checkAuth, postCreateValidation, validateRequest, PostController.update);
 router.delete('/:id', checkAuth, PostController.remove);
 
