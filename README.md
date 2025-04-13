@@ -2,6 +2,8 @@
 
 REST API для блога на Express и TS.
 
+[Фронтенд для этого API](https://blogaboutit.netlify.app/)
+
 ## Technologies Used
 
 - Node.js + Express
@@ -51,13 +53,13 @@ npm install
 
 create .env file in the root directory and specify:
 
-```js
-MONGODB_URI = your_mongodb_connection_string;
-JWT_SECRET = your_jwt_secret;
-PORT = your_port;
-CLOUDINARY_CLOUD_NAME = your_cloud_name;
-CLOUDINARY_API_KEY = your_key;
-CLOUDINARY_API_SECRET = your_secret;
+```
+MONGODB_URI = your_mongodb_connection_string
+JWT_SECRET = your_jwt_secret
+PORT = your_port
+CLOUDINARY_CLOUD_NAME = your_cloud_name
+CLOUDINARY_API_KEY = your_key
+CLOUDINARY_API_SECRET = your_secret
 ```
 
 compile the project:
