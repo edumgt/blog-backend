@@ -3,11 +3,11 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
-import authRoutes from './routes/authRoutes';
 import postRoutes from './routes/postRoutes';
 import uploadRoutes from './routes/uploadRoutes';
 import tagsRoutes from './routes/tagsRoutes';
 import commentRoutes from './routes/commentRoutes';
+import userRoutes from './routes/userRoutes';
 
 dotenv.config();
 
@@ -21,7 +21,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.use('/auth', authRoutes);
+app.use('/auth', userRoutes);
 app.use('/posts', postRoutes);
 app.use('/comments', commentRoutes);
 app.use(uploadRoutes);
