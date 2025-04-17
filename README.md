@@ -24,6 +24,7 @@ REST API для блога на Express и TS.
 - Загрузка изображений (Cloudinary)
 - Защита маршрутов (middleware checkAuth)
 - Валидация данных (express-validator)
+- Централизованная обработка ошибок (errorHandler)
 
 ### API Endpoints
 

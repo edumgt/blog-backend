@@ -8,6 +8,7 @@ import uploadRoutes from './routes/uploadRoutes';
 import tagsRoutes from './routes/tagsRoutes';
 import commentRoutes from './routes/commentRoutes';
 import userRoutes from './routes/userRoutes';
+import { errorHandler } from './middlewares/errorHandler';
 
 dotenv.config();
 
@@ -26,6 +27,8 @@ app.use('/posts', postRoutes);
 app.use('/comments', commentRoutes);
 app.use(uploadRoutes);
 app.use(tagsRoutes);
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 

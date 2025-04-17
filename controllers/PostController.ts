@@ -1,163 +1,88 @@
-import { Request, Response } from 'express';
-import { SortOrder } from 'mongoose';
+import { Request, Response, NextFunction } from 'express';
 
-import PostModel from '../models/Post';
 import { AuthRequest, GetAllQuery } from '../types';
+import { AppError } from '../utils/AppError';
+import {
+  createPost,
+  getAllPosts,
+  getLastTagsService,
+  getOnePost,
+  removePost,
+  updatePost,
+} from '../services/postService';
 
-export const getAll = async (req: Request<{}, {}, {}, GetAllQuery>, res: Response) => {
+export const create = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const sortParam = req.query.sort;
-    const tagFilter = req.query.tag;
-
-    const sortBy: { [key: string]: SortOrder } =
-      sortParam === 'popular' ? { viewsCount: -1 } : { createdAt: -1 };
-
-    const query: Record<string, any> = {};
-    if (tagFilter) {
-      query.tags = tagFilter;
+    if (!req.userId) {
+      throw new AppError('No access', 401);
     }
 
-    const posts = await PostModel.find(query)
-      .populate({ path: 'user', select: ['fullName', 'avatarUrl'] })
-      .sort(sortBy)
-      .exec();
-    res.status(200).json(posts);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: 'Error fetching posts',
-    });
-  }
-};
-
-export const getOne = async (req: Request, res: Response) => {
-  try {
-    const postId = req.params.id;
-
-    const doc = await PostModel.findOneAndUpdate(
-      {
-        _id: postId,
-      },
-      {
-        $inc: { viewsCount: 1 },
-      },
-      {
-        returnDocument: 'after',
-      },
-    )
-      .populate({ path: 'user', select: ['fullName', 'avatarUrl'] })
-      .exec();
-    if (!doc) {
-      res.status(404).json({
-        message: 'Post not found',
-      });
-      return;
-    }
-    res.status(200).json(doc);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: 'Error fetching post',
-    });
-  }
-};
-
-export const create = async (req: AuthRequest, res: Response) => {
-  try {
-    const doc = new PostModel({
-      title: req.body.title,
-      text: req.body.text,
-      tags: req.body.tags,
-      imageUrl: req.body.imageUrl,
-      user: req.userId,
-    });
-
-    const post = await doc.save();
+    const post = await createPost(req.body, req.userId);
 
     res.status(201).json(post);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: 'Error creating post',
-    });
+    next(err);
   }
 };
 
-export const remove = async (req: AuthRequest, res: Response) => {
+export const getAll = async (
+  req: Request<{}, {}, {}, GetAllQuery>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const postId = req.params.id;
+    const posts = await getAllPosts(req.query.sort, req.query.tag);
 
-    const doc = await PostModel.findById(postId);
-
-    if (!doc) {
-      res.status(404).json({ message: 'Post not found' });
-      return;
-    }
-
-    if (doc.user.toString() !== req.userId) {
-      res.status(403).json({ message: 'Access denied' });
-      return;
-    }
-
-    await PostModel.deleteOne({ _id: postId });
-
-    res.status(200).json({
-      success: true,
-    });
+    res.status(200).json(posts);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: 'Error deleting post',
-    });
+    next(err);
   }
 };
 
-export const update = async (req: AuthRequest, res: Response) => {
+export const getOne = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const postId = req.params.id;
+    const post = await getOnePost(req.params.id);
 
-    const doc = await PostModel.findById(postId);
-    if (!doc) {
-      res.status(404).json({ message: 'Post not found' });
-      return;
-    }
-
-    if (doc.user.toString() !== req.userId) {
-      res.status(403).json({ message: 'Access denied' });
-      return;
-    }
-
-    const updatedPost = await PostModel.findOneAndUpdate(
-      { _id: postId },
-      {
-        title: req.body.title,
-        text: req.body.text,
-        tags: req.body.tags,
-        imageUrl: req.body.imageUrl,
-      },
-      { returnDocument: 'after' },
-    );
-
-    res.status(200).json(updatedPost);
+    res.status(200).json(post);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: 'Error updating post',
-    });
+    next(err);
   }
 };
 
-export const getLastTags = async (_: Request, res: Response) => {
+export const update = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const posts = await PostModel.find().limit(5).exec();
+    if (!req.userId) {
+      throw new AppError('No access', 401);
+    }
 
-    const tags = [...new Set(posts.map((obj) => obj.tags).flat())].slice(0, 5);
+    const updated = await updatePost(req.params.id, req.userId, req.body);
+
+    res.status(200).json(updated);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const remove = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    if (!req.userId) {
+      throw new AppError('No access', 401);
+    }
+
+    const result = await removePost(req.params.id, req.userId);
+
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getLastTags = async (_: Request, res: Response, next: NextFunction) => {
+  try {
+    const tags = await getLastTagsService();
 
     res.status(200).json(tags);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: 'Error fetching tags',
-    });
+    next(err);
   }
 };

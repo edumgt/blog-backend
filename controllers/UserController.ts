@@ -1,109 +1,42 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import { Response } from 'express';
+import { Response, NextFunction } from 'express';
 
-import UserModel from '../models/User';
 import { AuthRequest } from '../types';
+import { AppError } from '../utils/AppError';
+import { getUser, loginUser, registerUser } from '../services/userService';
 
-export const register = async (req: AuthRequest, res: Response) => {
+export const register = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const password = req.body.password;
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt);
+    const { token, ...cleanUser } = await registerUser(req.body);
 
-    const doc = new UserModel({
-      fullName: req.body.fullName,
-      email: req.body.email,
-      avatarUrl: req.body.avatarUrl,
-      passwordHash: hash,
-    });
-
-    const user = await doc.save();
-
-    const token = jwt.sign(
-      {
-        _id: user._id,
-      },
-      process.env.JWT_SECRET || '',
-      {
-        expiresIn: '30d',
-      },
-    );
-
-    const { passwordHash, ...userData } = user.toObject();
-
-    res.status(201).json({
-      ...userData,
-      token,
-    });
+    res.status(201).json({ ...cleanUser, token });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: 'Registration error',
-    });
+    next(err);
   }
 };
 
-export const login = async (req: AuthRequest, res: Response) => {
+export const login = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const user = await UserModel.findOne({ email: req.body.email });
-
-    if (!user) {
-      res.status(404).json({
-        message: 'Incorrect login or password',
-      });
-      return;
-    }
-
-    const isValidPassword = await bcrypt.compare(req.body.password, user.toObject().passwordHash);
-
-    if (!isValidPassword) {
-      res.status(400).json({
-        message: 'Incorrect login or password',
-      });
-      return;
-    }
-
-    const token = jwt.sign(
-      {
-        _id: user._id,
-      },
-      process.env.JWT_SECRET || '',
-      {
-        expiresIn: '30d',
-      },
-    );
-    const { passwordHash, ...userData } = user.toObject();
+    const { token, ...cleanUser } = await loginUser(req.body.email, req.body.password);
 
     res.status(200).json({
-      ...userData,
+      ...cleanUser,
       token,
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: 'Authorization error',
-    });
+    next(err);
   }
 };
 
-export const getMe = async (req: AuthRequest, res: Response) => {
+export const getMe = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const user = await UserModel.findById(req.userId);
-    if (!user) {
-      res.status(404).json({
-        message: 'User not found',
-      });
-      return;
+    if (!req.userId) {
+      throw new AppError('No access', 401);
     }
 
-    const { passwordHash, ...userData } = user.toObject();
+    const cleanUser = await getUser(req.userId);
 
-    res.status(200).json(userData);
+    res.status(200).json(cleanUser);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: 'No access',
-    });
+    next(err);
   }
 };
